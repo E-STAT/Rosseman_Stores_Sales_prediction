@@ -55,7 +55,29 @@ if __name__ == '__main__':
         df_test.fillna(value = 0, inplace = True)
         return df_train, df_test
 
+    def Encoding(data):
+        data['p_1'] = data.PromoInterval.apply(lambda x: x[:3] if type(x) == str else 0)
+        data['p_2'] = data.PromoInterval.apply(lambda x: x[4:7] if type(x) == str else 0)
+        data['p_3'] = data.PromoInterval.apply(lambda x: x[8:11] if type(x) == str else 0)
+        data['p_4'] = data.PromoInterval.apply(lambda x: x[12:15] if type(x) == str else 0)
+
+        data = pd.get_dummies(data, columns = ['p_1', 'p_2', 'p_3', 'p_4',
+                                               'StateHoliday' ,
+                                               'StoreType',
+                                               'Assortment'])
+
+        data.drop(['p_1_0','p_2_0',
+                    'p_3_0', 'p_4_0',
+                     'StateHoliday_0',
+                    'Store',
+                    'PromoInterval',
+                    'Year'], axis = 1, inplace = True)
+
+        return data
+
+
     df_train, df_test = Fill_missing()
+    df_train, df_test = Encoding(df_train), Encoding(df_test)
 
     #Export cleaned data to csv and will be used in building model pipeline
     df_train.to_csv('../Supermarket/Data/cleaned_train.csv', index=False)
